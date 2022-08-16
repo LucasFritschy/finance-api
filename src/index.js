@@ -5,7 +5,6 @@ const app = express()
 
 app.use(express.json())
 
-
 const customers = []
 
 app.get('/account', (req, res) => {
@@ -14,12 +13,15 @@ app.get('/account', (req, res) => {
 
 app.post('/account', (req, res) => {
   const { cpf, name } = req.body
-  const uuid = uuidv4()
+
+  if (customers.some((customer) => customer.cpf === cpf)) {
+    return res.status(400).json({ error: 'Customer already exists!' })
+  }
 
   customers.push({
     cpf,
     name,
-    id: uuid,
+    id: uuidv4(),
     statements: []
   })
 
