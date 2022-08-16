@@ -8,7 +8,7 @@ app.use(express.json())
 const customers = []
 
 app.get('/account', (req, res) => {
-  return res.status(200).json({ customers })
+  return res.json({ customers })
 })
 
 app.post('/account', (req, res) => {
@@ -26,6 +26,18 @@ app.post('/account', (req, res) => {
   })
 
   return res.status(201).send()
+})
+
+app.get('/statement/:cpf', (req, res) => {
+  const { cpf } = req.params
+
+  const customer = customers.find((customer) => customer.cpf === cpf)
+
+  if (!customer) {
+    return res.status(400).json({ error: 'User not found' })
+  }
+
+  return res.json({ statements: customer.statements })
 })
 
 app.listen(3333)
