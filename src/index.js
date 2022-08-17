@@ -7,16 +7,36 @@ app.use(express.json())
 
 const customers = []
 
-app.get('/account', (req, res) => {
-  return res.json({ customers })
-})
+function checkIfAccountIsValid(req, res, next) {
+  const { cpf } = req.params
 
-app.post('/account', (req, res) => {
+  const customer = customers.find(customer => customer.cpf === cpf)
+
+  if (!customer) {
+    return res.status(400).json({ error: 'User not found' })
+  }
+
+  req.customer = customer
+
+  next()
+}
+
+function checkIfAccountAlreadyExists(req, res, next) {
   const { cpf, name } = req.body
 
   if (customers.some((customer) => customer.cpf === cpf)) {
     return res.status(400).json({ error: 'Customer already exists!' })
   }
+
+  next()
+}
+
+app.get('/account', (req, res) => {
+  return res.json({ customers })
+})
+
+app.post('/account', checkIfAccountAlreadyExists, (req, res) => {
+  const { cpf, name } = req.body
 
   customers.push({
     cpf,
@@ -28,14 +48,8 @@ app.post('/account', (req, res) => {
   return res.status(201).send()
 })
 
-app.get('/statement/:cpf', (req, res) => {
-  const { cpf } = req.params
-
-  const customer = customers.find((customer) => customer.cpf === cpf)
-
-  if (!customer) {
-    return res.status(400).json({ error: 'User not found' })
-  }
+app.get('/statement/:cpf', checkIfAccountIsValid, (req, res) => {
+  const customer = req.customer
 
   return res.json({ statements: customer.statements })
 })
