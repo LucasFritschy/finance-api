@@ -49,9 +49,23 @@ app.post('/account', checkIfAccountAlreadyExists, (req, res) => {
 })
 
 app.get('/statement/:cpf', checkIfAccountIsValid, (req, res) => {
-  const customer = req.customer
+  const { customer } = req
 
   return res.json({ statements: customer.statements })
+})
+
+app.post('/deposit/:cpf', checkIfAccountIsValid, (req, res) => {
+  const { description, amount } = req.body
+  const { customer } = req
+
+  customer.statements.push({
+    description,
+    amount,
+    created_at: new Date(),
+    type: 'Deposit'
+  })
+
+  return res.status(201).send()
 })
 
 app.listen(3333)
