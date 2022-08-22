@@ -1,3 +1,4 @@
+const { response } = require('express')
 const express = require('express')
 const { v4: uuidv4 } = require('uuid')
 
@@ -83,6 +84,14 @@ app.put('/account', checkIfAccountIsValid, (req, res) => {
   return res.status(201).send()
 })
 
+app.delete('/account', checkIfAccountIsValid, (req, res) => {
+  const { customer } = req
+
+  customers.splice(customer, 1)
+
+  return res.status(201).json(customer)
+})
+
 app.get('/statement', checkIfAccountIsValid, (req, res) => {
   const { customer } = req
 
@@ -127,5 +136,13 @@ app.post('/withdraw', checkIfAccountIsValid, getAccountBalance, validateWithdraw
 
   return res.status(201).send()
 })
+
+app.get('/balance', checkIfAccountIsValid, getAccountBalance, (req, res) => {
+  const { balance } = req
+
+  return res.json({ balance })
+})
+
+
 
 app.listen(3333)
