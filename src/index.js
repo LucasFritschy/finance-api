@@ -80,6 +80,17 @@ app.get('/statement', checkIfAccountIsValid, (req, res) => {
   return res.json({ statements: customer.statements })
 })
 
+app.get('/statement/date', checkIfAccountIsValid, (req, res) => {
+  const { customer } = req
+  const { date } = req.query
+
+  const dateFormat = new Date(`${date} 00:00`).toDateString()
+
+  const filteredStatements = customer.statements.filter(statement => statement.created_at.toDateString() === dateFormat)
+
+  return res.json({ filteredStatements })
+})
+
 app.post('/deposit', checkIfAccountIsValid, (req, res) => {
   const { description, amount } = req.body
   const { customer } = req
