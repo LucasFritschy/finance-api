@@ -8,7 +8,7 @@ app.use(express.json())
 const customers = []
 
 function checkIfAccountIsValid(req, res, next) {
-  const { cpf } = req.params
+  const { cpf } = req.headers
 
   const customer = customers.find(customer => customer.cpf === cpf)
 
@@ -74,13 +74,13 @@ app.post('/account', checkIfAccountAlreadyExists, (req, res) => {
   return res.status(201).send()
 })
 
-app.get('/statement/:cpf', checkIfAccountIsValid, (req, res) => {
+app.get('/statement', checkIfAccountIsValid, (req, res) => {
   const { customer } = req
 
   return res.json({ statements: customer.statements })
 })
 
-app.post('/deposit/:cpf', checkIfAccountIsValid, (req, res) => {
+app.post('/deposit', checkIfAccountIsValid, (req, res) => {
   const { description, amount } = req.body
   const { customer } = req
 
@@ -94,7 +94,7 @@ app.post('/deposit/:cpf', checkIfAccountIsValid, (req, res) => {
   return res.status(201).send()
 })
 
-app.post('/withdraw/:cpf', checkIfAccountIsValid, getAccountBalance, validateWithdraw, (req, res) => {
+app.post('/withdraw', checkIfAccountIsValid, getAccountBalance, validateWithdraw, (req, res) => {
   const { customer } = req
   const { description, amount } = req.body
 
